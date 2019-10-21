@@ -32,48 +32,48 @@ router.post('/',(req, res) => {
     });
     //数据库操作
     setTimeout(() => {
-        // 定义SQL语句
-        const sqlStr = `INSERT INTO user(userName,passWord,telePhone,sex,userType,description) VALUES(?,?,?,?,?,?)`;
-        //定义要插入的数据
-        let sqlData = [userName, afterPassword, telePhone, sex, userType, description];
-        connection.query(sqlStr, sqlData, (err, result) => {
-            if (err) {
-                let error = new returnValue.Error(err.message);
-                error.msg = "用户已存在"
-                return res.json(error);
-            }
-            //查询验证码库
-            const codeSql = 'select * from code where codeID = 1'
-            connection.query(codeSql, (err, codeResults) => {
-                //对验证码进行处理
-                let codeData = JSON.parse(JSON.stringify(codeResults));
-                let nowTime = Date.now();
-                try {
-                    //判断验证码是否过时
-                    if (nowTime > codeData[0].time) {
-                        let error = new returnValue.Error(err);
-                        error.msg = '验证码过期，请刷新验证码';
-                        return res.json(error);
-                    }
-                    //判断验证码
-                    else if (code !== codeData[0].code) {
-                        let error = new returnValue.Error(err);
-                        error.msg = '验证码错误';
-                        return res.json(error);
-                    }
-                    //验证码正确
-                    else {
-                        let success = new returnValue.Success(null);
-                        return res.json(success);
-                    }
-                }
-                //异常处理
-                catch (e) {
-                    let error = new returnValue.Error(e);
-                    error.msg = "注册失败"
+        //查询验证码库
+        const codeSql = 'select * from code where codeID = 1'
+        connection.query(codeSql, (err, codeResults) => {
+            //对验证码进行处理
+            let codeData = JSON.parse(JSON.stringify(codeResults));
+            let nowTime = Date.now();
+            try {
+                //判断验证码是否过时
+                if (nowTime > codeData[0].time) {
+                    let error = new returnValue.Error(err);
+                    error.msg = '验证码过期，请刷新验证码';
                     return res.json(error);
                 }
-            });
+                //判断验证码
+                else if (code !== codeData[0].code) {
+                    let error = new returnValue.Error(err);
+                    error.msg = '验证码错误';
+                    return res.json(error);
+                }
+                //验证码正确
+                else {
+                    // 定义SQL语句
+                    const sqlStr = `INSERT INTO user(userName,passWord,telePhone,sex,userType,description) VALUES(?,?,?,?,?,?)`;
+                    //定义要插入的数据
+                    let sqlData = [userName, afterPassword, telePhone, sex, userType, description];
+                    connection.query(sqlStr, sqlData, (err, result) => {
+                        if (err) {
+                            let error = new returnValue.Error(err.message);
+                            error.msg = "用户已存在"
+                            return res.json(error);
+                        }
+                        let success = new returnValue.Success(null);
+                        return res.json(success);
+                    });
+                }
+            }
+            //异常处理
+            catch (e) {
+                let error = new returnValue.Error(e);
+                error.msg = "注册失败"
+                return res.json(error);
+            }
         });
     }, 200);
 });
