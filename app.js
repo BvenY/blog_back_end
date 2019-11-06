@@ -9,6 +9,7 @@ let jwt = require('jwt-simple');
 ///=======路由信息 （接口地址）开始 存放在./routes目录下===========//
 let indexRouter = require('./routes/index');
 let getNum = require('./routes/getNum');
+let uploadImg = require('./routes/uploadImg');
 //用户模块
 let usersRouter = require('./routes/user/getUsers');
 let newUser = require('./routes/user/newUser');
@@ -87,6 +88,8 @@ app.all('/api/*', (req, res, next) => {
 /*接口路由暴露注册============================================开始*/ 
 app.use('/', indexRouter);
 app.use('/api/getNum', getNum);
+app.use('./public/img', express.static(path.join(__dirname, 'img')));
+app.use('/api/uploadImg', uploadImg);
 //用户模块
 app.use('/api/getUsers', usersRouter); 
 app.use('/newUser', newUser);
