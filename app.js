@@ -8,6 +8,7 @@ let jwt = require('jwt-simple');
 
 ///=======路由信息 （接口地址）开始 存放在./routes目录下===========//
 let indexRouter = require('./routes/index');
+let getNum = require('./routes/getNum');
 //用户模块
 let usersRouter = require('./routes/user/getUsers');
 let newUser = require('./routes/user/newUser');
@@ -35,6 +36,7 @@ let deleteType = require('./routes/blogType/deleteType');
 let changeType = require('./routes/blogType/changeType');
 //博客模块
 let getBlog = require('./routes/blog/getBlog');
+let getNew = require('./routes/blog/getNew');
 let deleteBlog = require('./routes/blog/deleteBlog');
 let searchBlog = require('./routes/blog/serchBlog');
 let addBlog = require('./routes/blog/addBlog');
@@ -47,6 +49,7 @@ let addComments = require('./routes/comments/addComments');
 let deleteComments = require('./routes/comments/deleteComments');
 //回复模块
 let addReply = require('./routes/reply/addReply');
+let getReply = require('./routes/reply/getReply');
 let deleteReply = require('./routes/reply/deleteReply');
 ///=======路由信息 （接口地址）结束 存放在./routes目录下===========//
 
@@ -83,6 +86,7 @@ app.all('/api/*', (req, res, next) => {
 
 /*接口路由暴露注册============================================开始*/ 
 app.use('/', indexRouter);
+app.use('/api/getNum', getNum);
 //用户模块
 app.use('/api/getUsers', usersRouter); 
 app.use('/newUser', newUser);
@@ -109,7 +113,8 @@ app.use('/api/addType', addType);
 app.use('/api/deleteType', deleteType); 
 app.use('/api/changeType', changeType); 
 //博客模块
-app.use('/getBlog', getBlog);
+app.use('/api/getBlog', getBlog);
+app.use('/getNew', getNew);
 app.use('/api/deleteBlog', deleteBlog); 
 app.use('/searchBlog', searchBlog);
 app.use('/api/addBlog', addBlog); 
@@ -121,6 +126,7 @@ app.use('/allComments', allComments);
 app.use('/api/addComments', addComments); 
 app.use('/api/deleteComments', deleteComments); //后期添加删除自己的评论功能
 //回复模块
+app.use('/api/getReply', getReply); 
 app.use('/api/addReply', addReply); 
 app.use('/api/deleteReply', deleteReply); 
 /*接口路由暴露注册============================================结束*/

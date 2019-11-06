@@ -4,9 +4,10 @@ let url = require('url');
 let qs = require('qs');
 const connection = require('../../public/javascripts/database');
 const returnValue = require('../../public/javascripts/return');
+let token = require('../../public/javascripts/token');
 
 
-router.get('/', (req, res) => {
+router.get('/',token, (req, res) => {
     //先获取get传过来的参数
     let parseObj = url.parse(req.url);
     let reqData = qs.parse(parseObj.query);
@@ -32,16 +33,31 @@ router.get('/', (req, res) => {
         let count = JSON.parse(result)[1];
         let key = Object.keys(count[0]);
         let resCount = count[0][key];
-        //封装一个返回类
-        class response{
-            constructor(data,count){
-                this.data = data;
-                this.totalCount = count;
-            }
+        for(let i = 0;i < blogData.length;i++){
+            const userSql = `select userName from user where userID = ?`;
+            let userData = blogData[i].userID;
+            connection.query(userSql, userData, (err, userReusult) => {
+                userReusult = JSON.parse(JSON.stringify(userReusult));
+                if (err) {
+                    let error = new returnValue.Error(err);
+                    return res.json(error);
+                }
+                blogData[i]['userName'] = userReusult[0].userName;
+                delete blogData[i]['userID'];
+            });
         }
-        let resData = new response(blogData, resCount);
-        let success = new returnValue.Success(resData);
-        res.json(success);
+        setTimeout(() => {
+            //封装一个返回类
+            class response {
+                constructor(data, count) {
+                    this.data = data;
+                    this.totalCount = count;
+                }
+            }
+            let resData = new response(blogData, resCount);
+            let success = new returnValue.Success(resData);
+            res.json(success);
+        }, 300);
     })
 });
 
