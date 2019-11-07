@@ -1,8 +1,6 @@
 let jwt = require('jwt-simple');
 let jwtTokenSecret = 'aijiaojiaobabyzhenshitaihaole';
 const returnValue = require('../../public/javascripts/return');
-//set the token expires time = 30min
-let expires = Date.now() + 1000 * 60 * 30;
 
 module.exports = (req, res, next)=>{
     //获取http requset中的token
@@ -21,11 +19,12 @@ module.exports = (req, res, next)=>{
                 //刷新token的过期时间
                 let newToken = jwt.encode({
                     iis: decoded.iis,
-                    expires: expires
+                    expires: Date.now() + 1000 * 60 * 30
                 }, jwtTokenSecret);
                 //把用户权限信息加到request中
                 req.userType = decoded.iis;
                 req.headers['x-access-token'] = newToken;
+                res.header("x-access-token", newToken);
                 //路由放行
                 next();
             }

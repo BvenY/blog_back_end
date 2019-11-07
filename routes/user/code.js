@@ -8,11 +8,11 @@ router.get('/', function (req, res) {
     let captcha = svgCaptcha.create({
         size: 4,
         ignoreChars: '0o1i',
-        noise: 6,
+        noise: 3,
         width: 100,
         height: 40,
         fontSize: 50,
-        background:"#35495E"
+        background:"#F1F3F4"
     });
     //存入数据库
     const sqlStr = `UPDATE code SET code = ? , time = ? WHERE codeID = 1`

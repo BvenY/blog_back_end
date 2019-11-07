@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
         setTimeout(() => {
             let success = new returnValue.Success(blogData);
             res.json(success);
-        }, 300);
+        }, 100);
     })
 });
 

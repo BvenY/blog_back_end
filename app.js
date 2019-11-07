@@ -4,7 +4,7 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let bodyParser = require('body-parser');
-let jwt = require('jwt-simple');
+// let jwt = require('jwt-simple');
 
 ///=======路由信息 （接口地址）开始 存放在./routes目录下===========//
 let indexRouter = require('./routes/index');
@@ -60,7 +60,7 @@ let app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 //the secret of token
-app.set("jwtTokenSecret", "aijiaojiaobabyzhenshitaihaole");
+// app.set("jwtTokenSecret", "aijiaojiaobabyzhenshitaihaole");
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -76,7 +76,14 @@ app.use(bodyParser.json());
 app.all('*', (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-  next();
+  res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With, x-access-token");
+  res.header("Access-Control-Expose-Headers", "x-access-token");
+  if (req.method == 'OPTIONS') {
+    res.send(200);
+  }
+  else {
+    next();
+  }
 });
 
 //对需要权限设置的接口返回新的token

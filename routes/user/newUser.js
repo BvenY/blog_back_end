@@ -10,7 +10,7 @@ router.post('/',(req, res) => {
     /*解析post请求中所携带的数据*/
     const requestData = req.body;
     /*对必要数据进行判空*/
-    if (!("userName" in requestData && "passWord" in requestData && "telePhone" in requestData && "userType" in requestData && "description" in requestData && "code" in requestData)){
+    if (!("userName" in requestData && "passWord" in requestData && "telePhone" in requestData && "userType" in requestData && "code" in requestData)){
         let error  = new returnValue.Error(null);
         error.msg = "参数错误"
         return res.json(error);
