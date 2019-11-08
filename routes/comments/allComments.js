@@ -4,9 +4,9 @@ let url = require('url');
 let qs = require('qs');
 const connection = require('../../public/javascripts/database');
 const returnValue = require('../../public/javascripts/return');
+let token = require('../../public/javascripts/token');
 
-
-router.get('/', (req, res) => {
+router.get('/', token,(req, res) => {
     //先获取get传过来的参数
     let parseObj = url.parse(req.url);
     let reqData = qs.parse(parseObj.query);
@@ -25,6 +25,7 @@ router.get('/', (req, res) => {
     connection.query(sqlStr, sqlData, (err, results) => {
         //最终返回的数据
         let commentsData;
+        let totalCount = 0;
         //对评论表返回的数据进行处理
         let result = JSON.stringify(results);
         commentsData = JSON.parse(result);
@@ -41,6 +42,18 @@ router.get('/', (req, res) => {
         }
         //正常情况
         else {
+            //查询总的评论条数名字
+            const sqlStr_num = "select COUNT(*) from comments";
+            connection.query(sqlStr_num, (err, results) => {
+                results = JSON.parse(JSON.stringify(results));
+                try {
+                    totalCount = results[0]['COUNT(*)'];
+                }
+                catch {
+                    let error = new returnValue.Error(err);
+                    return res.json(error);
+                }
+            });
             //对评论返回结果进行遍历
             for (let i = 0; i < commentsData.length; i++) {
                 //查询对应的userID对应的userName
@@ -55,37 +68,45 @@ router.get('/', (req, res) => {
                         return res.json(error);
                     }
                     commentsData[i].commentsName = userData[keyName];
+                    delete commentsData[i].userID;
                 });
-                //查询每一条评论对应的回复
+                //查询每一条评论对应的回复数量
                 let commentsID = commentsData[i].commentsID;
-                const sqlStr_reply = "select * from reply where commentsID = ?";
+                const sqlStr_reply = "select COUNT(*) from reply where commentsID = ?";
                 connection.query(sqlStr_reply, commentsID, (err, results) => {
-                    let result = JSON.stringify(results);
-                    let replyData = JSON.parse(result);
-                    if (err) {
+                    results = JSON.parse(JSON.stringify(results));
+                    try {
+                        commentsData[i].replyNum = results[0]['COUNT(*)'];
+                    }
+                    catch {
                         let error = new returnValue.Error(err);
                         return res.json(error);
                     }
-                    commentsData[i].reply = replyData;
-                    //对回复查询结果进行遍历，查询对应的userName
-                    for (let j = 0; j < replyData.length; j++) {
-                        let replyUser = replyData[j].userID;
-                        const sqlStr_reply_user = "select userName from user where userID = ?";
-                        connection.query(sqlStr_reply_user, replyUser, (err, results) => {
-                            let result = JSON.stringify(results);
-                            let replyData = JSON.parse(result)[0];
-                            let keyName = Object.keys(replyData);
-                            if (err) {
-                                let error = new returnValue.Error(err);
-                                return res.json(error);
-                            }
-                            commentsData[i].reply[j].replyName = replyData[keyName];
-                        });
+                });
+                //查询每一条评论对应的博客名字
+                let blogID = commentsData[i].blogID;
+                const sqlStr_blog = "select blogName from blog where blogID = ?";
+                connection.query(sqlStr_blog, blogID, (err, results) => {
+                    results = JSON.parse(JSON.stringify(results));
+                    try {
+                        commentsData[i].blogName = results[0]['blogName'];
+                    }
+                    catch {
+                        let error = new returnValue.Error(err);
+                        return res.json(error);
                     }
                 });
             }
             setTimeout(() => {
-                let success = new returnValue.Success(commentsData);
+                //封装一个返回类
+                class response {
+                    constructor(data, count) {
+                        this.data = data;
+                        this.totalCount = count;
+                    }
+                }
+                let resData = new response(commentsData, totalCount);
+                let success = new returnValue.Success(resData);
                 res.json(success);
             }, 300);
         }

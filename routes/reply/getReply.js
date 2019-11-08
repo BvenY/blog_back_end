@@ -8,6 +8,10 @@ let token = require('../../public/javascripts/token');
 
 
 router.get('/',token, (req, res) => {
+    if (req.userType != 1 && req.userType != 520) {
+        let permission = new returnValue.Permission(null);
+        return res.json(permission);
+    }
     //先获取get传过来的参数
     let parseObj = url.parse(req.url);
     let reqData = qs.parse(parseObj.query);

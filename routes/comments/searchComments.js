@@ -4,22 +4,26 @@ let url = require('url');
 let qs = require('qs');
 const connection = require('../../public/javascripts/database');
 const returnValue = require('../../public/javascripts/return');
+let token = require('../../public/javascripts/token');
 
-
-router.get('/', (req, res) => {
+router.get('/', token, (req, res) => {
+    if (req.userType != 1 && req.userType != 520) {
+        let permission = new returnValue.Permission(null);
+        return res.json(permission);
+    }
     //先获取get传过来的参数
     let parseObj = url.parse(req.url);
     let reqData = qs.parse(parseObj.query);
     //再对必要参数进行判空
-    if (!("blogID" in reqData)) {
+    if (!("commentsID" in reqData )) {
         let error = new returnValue.Error(null);
         error.msg = "参数错误"
         return res.json(error);
     }
-    let blogID = reqData.blogID;
+    let commentsID = reqData.commentsID;
     // 定义查询评论SQL语句
-    const sqlStr = `select * from comments where blogID = ?`
-    let sqlData = [blogID];
+    const sqlStr = `select * from comments  WHERE commentsID = ?`
+    let sqlData = [commentsID];
     //数据库操作
     connection.query(sqlStr, sqlData, (err, results) => {
         //最终返回的数据
@@ -35,11 +39,11 @@ router.get('/', (req, res) => {
         //查询结果为空的处理
         else if (result === '[]') {
             let success = new returnValue.Success(null);
-            success.msg = "该博客暂无评论"
+            success.msg = "该评论不存在"
             return res.json(success);
         }
         //正常情况
-        else{
+        else {
             //对评论返回结果进行遍历
             for (let i = 0; i < commentsData.length; i++) {
                 //查询对应的userID对应的userName
@@ -54,32 +58,32 @@ router.get('/', (req, res) => {
                         return res.json(error);
                     }
                     commentsData[i].commentsName = userData[keyName];
+                    delete commentsData[i].userID;
                 });
-                //查询每一条评论对应的回复
+                //查询每一条评论对应的回复数量
                 let commentsID = commentsData[i].commentsID;
-                const sqlStr_reply = "select * from reply where commentsID = ?";
+                const sqlStr_reply = "select COUNT(*) from reply where commentsID = ?";
                 connection.query(sqlStr_reply, commentsID, (err, results) => {
-                    let result = JSON.stringify(results);
-                    let replyData = JSON.parse(result);
-                    if (err) {
+                    results = JSON.parse(JSON.stringify(results));
+                    try {
+                        commentsData[i].replyNum = results[0]['COUNT(*)'];
+                    }
+                    catch {
                         let error = new returnValue.Error(err);
                         return res.json(error);
                     }
-                    commentsData[i].reply = replyData;
-                    //对回复查询结果进行遍历，查询对应的userName
-                    for (let j = 0; j < replyData.length; j++) {
-                        let replyUser = replyData[j].userID;
-                        const sqlStr_reply_user = "select userName from user where userID = ?";
-                        connection.query(sqlStr_reply_user, replyUser, (err, results) => {
-                            let result = JSON.stringify(results);
-                            let replyData = JSON.parse(result)[0];
-                            let keyName = Object.keys(replyData);
-                            if (err) {
-                                let error = new returnValue.Error(err);
-                                return res.json(error);
-                            }
-                            commentsData[i].reply[j].replyName = replyData[keyName];
-                        });
+                });
+                //查询每一条评论对应的博客名字
+                let blogID = commentsData[i].blogID;
+                const sqlStr_blog = "select blogName from blog where blogID = ?";
+                connection.query(sqlStr_blog, blogID, (err, results) => {
+                    results = JSON.parse(JSON.stringify(results));
+                    try {
+                        commentsData[i].blogName = results[0]['blogName'];
+                    }
+                    catch {
+                        let error = new returnValue.Error(err);
+                        return res.json(error);
                     }
                 });
             }

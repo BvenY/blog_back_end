@@ -6,8 +6,6 @@ let url = require('url');
 let qs = require('qs');
 let jwt = require('jwt-simple');
 let jwtTokenSecret = 'aijiaojiaobabyzhenshitaihaole';
-//set the token expires time = 30min
-let expires = Date.now() + 1000 * 60 * 30;
 const connection = require('../../public/javascripts/database');
 const returnValue = require('../../public/javascripts/return');
 
@@ -83,7 +81,7 @@ router.get('/',(req, res)=>{
                                 //返回token
                                 let token = jwt.encode({
                                     iis: resData.userType,
-                                    expires: expires
+                                    expires: Date.now() + 1000 * 60 * 30
                                 }, jwtTokenSecret);
                                 //token加入到返回头中
                                 res.header("x-access-token", token);

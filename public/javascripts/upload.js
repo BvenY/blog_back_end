@@ -21,7 +21,8 @@ module.exports = (req, res) => {
 
     /* 格式化form数据 */
     form.parse(req, (err, fields, files) => {
-        let file = files[''];
+        console.log(files);
+        let file = files['image'];
         /* 如果出错，则拦截 */
         if (err) {
             let error = new returnValue.Error(err);

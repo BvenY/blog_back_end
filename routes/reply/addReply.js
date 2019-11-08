@@ -5,7 +5,7 @@ const connection = require('../../public/javascripts/database');
 const returnValue = require('../../public/javascripts/return');
 let token = require('../../public/javascripts/token');
 
-router.post('/', token,(req, res) => {
+router.post('/', token ,(req, res) => {
     if (req.userType != 1 && req.userType != 520 && req.userType != 0) {
         let permission = new returnValue.Permission(null);
         return res.json(permission);

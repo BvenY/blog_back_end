@@ -5,6 +5,10 @@ const returnValue = require('../public/javascripts/return');
 let token = require('../public/javascripts/token');
 
 router.get('/', token,(req, res) => {
+    if (req.userType != 1 && req.userType != 520) {
+        let permission = new returnValue.Permission(null);
+        return res.json(permission);
+    }
     // 定义SQL语句
     const sqlBlog = `SELECT COUNT(*) FROM blog`;
     connection.query(sqlBlog,(err, results) => {

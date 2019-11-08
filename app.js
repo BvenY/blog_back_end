@@ -47,6 +47,7 @@ let typeBlog = require('./routes/blog/typeBlog');
 let getComments = require('./routes/comments/getComments');
 let allComments = require('./routes/comments/allComments');
 let addComments = require('./routes/comments/addComments');
+let searchComments = require('./routes/comments/searchComments');
 let deleteComments = require('./routes/comments/deleteComments');
 //回复模块
 let addReply = require('./routes/reply/addReply');
@@ -76,7 +77,7 @@ app.use(bodyParser.json());
 app.all('*', (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With, x-access-token");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With, x-access-token, multipart/form-data");
   res.header("Access-Control-Expose-Headers", "x-access-token");
   if (req.method == 'OPTIONS') {
     res.send(200);
@@ -132,8 +133,9 @@ app.use('/api/changeBlog', changeBlog);
 app.use('/typeBlog', typeBlog);
 //评论模块
 app.use('/getComments', getComments);
-app.use('/allComments', allComments);
+app.use('/api/allComments', allComments);
 app.use('/api/addComments', addComments); 
+app.use('/api/searchComments', searchComments);
 app.use('/api/deleteComments', deleteComments); //后期添加删除自己的评论功能
 //回复模块
 app.use('/api/getReply', getReply); 

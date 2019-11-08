@@ -36,9 +36,18 @@ router.post('/', token,(req, res) => {
     //数据库操作
     setTimeout(() => {
         // 定义SQL语句
-        const sqlStr = `UPDATE user SET userName = ?, passWord = ?,telePhone = ?, userType = ?, description = ?, sex = ?  WHERE userID = ?`;
-        //定义要插入的数据
-        let sqlData = [userName, afterPassword, telePhone,userType, description, sex, userID];
+        let sqlStr = ``;
+        let sqlData = [];
+        if (passWord) {
+            sqlStr = `UPDATE user SET userName = ?, passWord = ?,telePhone = ?, userType = ?, description = ?, sex = ?  WHERE userID = ?`;
+            //定义要插入的数据
+            sqlData = [userName, afterPassword, telePhone, userType, description, sex, userID];
+        }
+        else{
+            sqlStr = `UPDATE user SET userName = ?,telePhone = ?, userType = ?, description = ?, sex = ?  WHERE userID = ?`;
+            //定义要插入的数据
+            sqlData = [userName,telePhone, userType, description, sex, userID];
+        }
         connection.query(sqlStr, sqlData, (err, results) => {
             let result = JSON.stringify(results);
             if (err) {

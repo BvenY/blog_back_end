@@ -16,15 +16,15 @@ router.get('/', token,(req, res) => {
     let parseObj = url.parse(req.url);
     let reqData = qs.parse(parseObj.query);
     //再对用户名进行判空
-    if (!("userName" in reqData)) {
+    if (!("userID" in reqData)) {
         let error = new returnValue.Error(null);
-        error.msg = "请输入用户名"
+        error.msg = "请输入用户ID"
         return res.json(error);
     }
-    let userName = reqData.userName.toString();
+    let userID = reqData.userID;
     // 定义SQL语句
-    const sqlStr = `select * from user where userName = ?`;
-    connection.query(sqlStr,userName,(err, results) => {
+    const sqlStr = `select * from user where userID = ?`;
+    connection.query(sqlStr, userID,(err, results) => {
         let result = JSON.stringify(results);
         if (err) {
             let error = new returnValue.Error(err);
