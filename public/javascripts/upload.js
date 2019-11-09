@@ -17,7 +17,7 @@ module.exports = (req, res) => {
     /* 保留文件后缀名 */
     form.keepExtensions = true;
     /* 设置文件大小 */
-    form.maxFieldsSize = 5 * 1024 * 1024;
+    form.maxFieldsSize = 2 * 1024 * 1024;
 
     /* 格式化form数据 */
     form.parse(req, (err, fields, files) => {
@@ -31,7 +31,7 @@ module.exports = (req, res) => {
         if (file.size > form.maxFieldsSize) {
             fs.unlink(file.path);
             let error = new returnValue.Error(err);
-            error.msg = '图片大小不能超过5M';
+            error.msg = '图片大小不能超过2M';
             return res.json(error);
         }
         /* 存储后缀名 */
@@ -69,7 +69,7 @@ module.exports = (req, res) => {
                 error.msg = '图片上传失败';
                 return res.json(error);
             } else {
-                let success = new returnValue.Success(`http://localhost:3000/img/${imageName}`);
+                let success = new returnValue.Success(`http://blog.bestbven.top/api/img/${imageName}`);
                 success.msg = '图片上传成功';
                 res.json(success);
             }
