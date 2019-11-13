@@ -19,7 +19,7 @@ module.exports = (req, res, next)=>{
                 //刷新token的过期时间
                 let newToken = jwt.encode({
                     iis: decoded.iis,
-                    expires: Date.now() + 1000 * 60 * 30
+                    expires: Date.now() + 1000 * 60 * 720
                 }, jwtTokenSecret);
                 //把用户权限信息加到request中
                 req.userType = decoded.iis;

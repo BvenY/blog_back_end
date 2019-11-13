@@ -81,7 +81,7 @@ router.get('/',(req, res)=>{
                                 //返回token
                                 let token = jwt.encode({
                                     iis: resData.userType,
-                                    expires: Date.now() + 1000 * 60 * 30
+                                    expires: Date.now() + 1000 * 60 * 720
                                 }, jwtTokenSecret);
                                 //token加入到返回头中
                                 res.header("x-access-token", token);

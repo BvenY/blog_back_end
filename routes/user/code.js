@@ -18,7 +18,7 @@ router.get('/', function (req, res) {
     //存入数据库
     const sqlStr = `UPDATE code SET code = ? , time = ? WHERE codeID = 1`
     //设置过期时间
-    let time = Date.now() + 1000 * 60 * 1;
+    let time = Date.now() + 1000 * 60 * 10;
     //转换为小写字母
     let sqlData = [(captcha.text).toLowerCase(),time];
     connection.query(sqlStr, sqlData,(err, results) => {
